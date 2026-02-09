@@ -8,10 +8,13 @@ datasource db {
 }
 
 model Usuario {
-  id       String @id @default(cuid())
-  email    String @unique
-  senha    String
-  nome     String
+  id               String    @id @default(cuid())
+  username         String    @unique
+  email            String    @unique
+  password         String    // Senha hash (nunca texto plano)
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
 }
 
 model Veiculo {
