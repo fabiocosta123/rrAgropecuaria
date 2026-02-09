@@ -1,72 +1,77 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 
-export default async function DashboardGeral() {
-  // Buscamos os totais para o resumo
-  const [totalVeiculos, totalMotoristas, abastecimentos] = await Promise.all([
-    prisma.veiculo.count(),
-    prisma.motorista.count(),
-    prisma.abastecimento.findMany({
-      orderBy: { data: 'desc' },
-      take: 10, // Pegamos os últimos 10 para o resumo
-      include: { veiculo: true }
-    })
-  ]);
+export default async function DashboardPage() {
+  // 1. Buscando dados básicos para os cards
+  const totalAbastecimentos = await prisma.abastecimento.findMany();
+  
+  const gastoTotal = totalAbastecimentos.reduce((acc, curr) => acc + (curr.quantidadeLitros * curr.precoPorLitro), 0);
+  const totalLitros = totalAbastecimentos.reduce((acc, curr) => acc + curr.quantidadeLitros, 0);
+  const mediaPreco = totalAbastecimentos.length > 0 ? (gastoTotal / totalLitros) : 0;
 
-  const gastoTotal = abastecimentos.reduce((acc, curr) => acc + curr.valorTotal, 0);
+  // 2. Últimos 5 registros para a tabela rápida
+  const ultimosRegistros = await prisma.abastecimento.findMany({
+    take: 5,
+    orderBy: { data: 'desc' },
+    include: { veiculo: true, motorista: true }
+  });
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto text-black">
       <header className="mb-10">
-        <h1 className="text-4xl font-extrabold text-gray-900 italic">Controle RR Agropecuária</h1>
-        <p className="text-gray-500">Visão geral da frota e consumo de combustível</p>
+        <h1 className="text-4xl font-black text-gray-900 tracking-tighter">DASHBOARD</h1>
+        <p className="text-gray-500 font-medium">Visão geral da frota RR Agro</p>
       </header>
 
-      {/* CARDS DE RESUMO RÁPIDO */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <div className="bg-white p-6 rounded-2xl shadow-md border-b-4 border-blue-500">
-          <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">Veículos</span>
-          <p className="text-3xl font-black">{totalVeiculos}</p>
+      {/* CARDS DE RESUMO */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <p className="text-sm font-bold text-gray-400 uppercase mb-1">Gasto Total</p>
+          <h2 className="text-3xl font-black text-blue-600">
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(gastoTotal)}
+          </h2>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-md border-b-4 border-green-500">
-          <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">Motoristas</span>
-          <p className="text-3xl font-black">{totalMotoristas}</p>
+
+        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <p className="text-sm font-bold text-gray-400 uppercase mb-1">Combustível Total</p>
+          <h2 className="text-3xl font-black text-gray-800">{totalLitros.toFixed(2)} <span className="text-lg">L</span></h2>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-md border-b-4 border-yellow-500">
-          <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">Últimos Gastos (10)</span>
-          <p className="text-3xl font-black text-red-600">R$ {gastoTotal.toLocaleString('pt-BR')}</p>
+
+        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <p className="text-sm font-bold text-gray-400 uppercase mb-1">Média Preço/Litro</p>
+          <h2 className="text-3xl font-black text-green-600">
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(mediaPreco)}
+          </h2>
         </div>
-        <Link href="/abastecimento" className="bg-blue-600 p-6 rounded-2xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center text-white font-bold text-center">
-          + REGISTRAR NOVO ABASTECIMENTO
-        </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* ÚLTIMAS ATIVIDADES */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <h2 className="text-xl font-bold mb-6">Atividade Recente</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* TABELA DE ÚLTIMAS ATIVIDADES */}
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+          <h3 className="text-xl font-black mb-6">Últimos Abastecimentos</h3>
           <div className="space-y-4">
-            {abastecimentos.map((abast) => (
-              <div key={abast.id} className="flex justify-between items-center border-b pb-3 last:border-0">
+            {ultimosRegistros.map((reg) => (
+              <div key={reg.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
                 <div>
-                  <p className="font-bold text-gray-800">{abast.veiculo.placa}</p>
-                  <p className="text-xs text-gray-400">{new Date(abast.data).toLocaleDateString('pt-BR')}</p>
+                  <p className="font-bold text-gray-800">{reg.veiculo.modelo} ({reg.veiculo.placa})</p>
+                  <p className="text-xs text-gray-500">{reg.motorista.nome} • {new Date(reg.data).toLocaleDateString('pt-BR')}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-green-600 font-bold">R$ {abast.valorTotal.toFixed(2)}</p>
-                  <p className="text-xs text-gray-400">{abast.quantidadeLitros}L</p>
+                  <p className="font-black text-blue-600">R$ {(reg.quantidadeLitros * reg.precoPorLitro).toFixed(2)}</p>
+                  <p className="text-xs text-gray-400">{reg.quantidadeLitros}L</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ACESSO RÁPIDO */}
-        <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-bold mb-2">Ações Rápidas</h2>
-          <Link href="/veiculo" className="bg-gray-100 p-4 rounded-xl hover:bg-gray-200 transition font-medium">📦 Gerenciar Frota</Link>
-          <Link href="/motorista" className="bg-gray-100 p-4 rounded-xl hover:bg-gray-200 transition font-medium">👤 Cadastro de Motoristas</Link>
-          <Link href="/historico" className="bg-gray-100 p-4 rounded-xl hover:bg-gray-200 transition font-medium">📊 Relatório Completo</Link>
+        {/* CARD DE ATALHOS RÁPIDOS */}
+        <div className="bg-blue-600 p-8 rounded-3xl shadow-xl shadow-blue-100 text-white flex flex-col justify-center">
+          <h3 className="text-2xl font-black mb-4">Ações Rápidas</h3>
+          <p className="mb-8 opacity-80 font-medium">Selecione uma operação para gerenciar a agropecuária.</p>
+          <div className="grid grid-cols-2 gap-4">
+            <a href="/abastecimento" className="bg-white text-blue-600 p-4 rounded-2xl font-bold text-center hover:bg-blue-50 transition">Novo Abastecimento</a>
+            <a href="/veiculo" className="bg-blue-500 text-white p-4 rounded-2xl font-bold text-center hover:bg-blue-400 transition border border-blue-400">Ver Frota</a>
+          </div>
         </div>
       </div>
     </div>
