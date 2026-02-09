@@ -89,7 +89,7 @@ export default async function DetalhesVeiculo({ params }: { params: Promise<{ id
                 {/* Variação de Preço */}
                 <div>
                   <p className="text-[10px] text-gray-400 uppercase font-black mb-1">Preço Litro</p>
-                  <p className="text-xl font-black text-gray-800" suppressHydrationWarning>R$ {abast.precoPorLitro.toFixed(3)}</p>
+                  <p className="text-xl font-black text-gray-800" suppressHydrationWarning>R$ {abast.precoPorLitro.toFixed(2)}</p>
                   {anterior && (
                     <p className={`text-[10px] font-black flex items-center mt-1 ${diffPreco > 0 ? 'text-red-500' : diffPreco < 0 ? 'text-green-500' : 'text-gray-400'}`}>
                       {diffPreco > 0 ? '▲' : diffPreco < 0 ? '▼' : '●'} 
