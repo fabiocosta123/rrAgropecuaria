@@ -47,7 +47,7 @@ export function ModalGraficoPreco({ postoId, nomePosto, onClose }: { postoId: st
                                     <Tooltip
                                         contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                                         formatter={(value: any) => [
-                                            `R$ ${Number(value).toFixed(3)}`,
+                                            `R$ ${Number(value).toFixed(2)}`,
                                             'Preço por Litro'
                                         ]}
                                     />

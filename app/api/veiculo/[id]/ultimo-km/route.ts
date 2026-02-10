@@ -1,18 +1,18 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const id = params.id;
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
 
-  const agregacao = await prisma.abastecimento.aggregate({
-    where: { veiculoId: id },
-    _max: { hodometro: true },
-  });
+    const { id } = await params;
+    const ultimoRegistro = await prisma.abastecimento.findFirst({
+      where: { veiculoId: id },
+      orderBy: { hodometro: 'desc' },
+      select: { hodometro: true }
+    });
 
-  return NextResponse.json({ 
-    ultimoKm: agregacao._max.hodometro || 0 
-  });
+    return NextResponse.json({ ultimoKm: ultimoRegistro?.hodometro || 0 });
+  } catch (error) {
+    return NextResponse.json({ ultimoKm: 0 }, { status: 500 });
+  }
 }

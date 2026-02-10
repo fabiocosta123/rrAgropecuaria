@@ -142,7 +142,7 @@ export default async function HistoricoPage({ searchParams }: HistoricoProps) {
                             <Car size={18} />
                           </div>
                           <div>
-                            <Link href={`/veiculos`} className="text-gray-900 font-black hover:underline block leading-none">
+                            <Link href={`/veiculo`} className="text-gray-900 font-black hover:underline block leading-none">
                               {reg.veiculo.placa}
                             </Link>
                             <span className="text-[10px] text-gray-400 font-black uppercase">{reg.veiculo.modelo}</span>

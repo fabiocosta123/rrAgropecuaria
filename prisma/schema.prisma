@@ -20,6 +20,8 @@ model Usuario {
 model Veiculo {
   id             String          @id @default(cuid())
   placa          String          @unique
+  intervaloTrocaOleo  Int              @default(10000) // Padrão 10 mil km
+  ultimoKmTrocaOleo   Int              @default(0)
   modelo         String
   abastecimentos Abastecimento[]
 }
