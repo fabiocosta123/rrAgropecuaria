@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-// Definimos o tipo de retorno explicitamente para o TypeScript parar de reclamar
+
 export type ActionResponse = {
   success: boolean;
   message: string;
@@ -57,7 +57,7 @@ export async function salvarAbastecimento(formData: FormData): Promise<ActionRes
 
     // 5. Revalidação de cache
     revalidatePath("/historico");
-    revalidatePath("/dashboard"); // Se você tiver um dashboard
+    revalidatePath("/dashboard"); 
     
     return { 
       success: true, 

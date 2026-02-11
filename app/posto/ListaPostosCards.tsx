@@ -1,137 +1,71 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { MapPin, ChevronRight, BarChart3, Plus, X } from "lucide-react";
-import { ModalGraficoPreco } from "@/app/components/ModalGraficoPrecos";
-import { criarPosto } from "./actions";
-import { toast } from "sonner";
+import { useState } from "react";
+import { Search, Fuel, MapPin, Pencil } from "lucide-react";
+import { BotaoExcluir } from "@/app/components/BotaoExlcuir";
+import Link from "next/link";
 
 export function ListaPostosCards({ postosInitial }: { postosInitial: any[] }) {
-  // Estados para gerenciar os modais
-  const [postoSelecionado, setPostoSelecionado] = useState<{ id: string, nome: string } | null>(null);
-  const [isModalCadastroAberto, setIsModalCadastroAberto] = useState(false);
-  
-  // Ref para manipular o formulário sem re-renderizar
-  const formRef = useRef<HTMLFormElement>(null);
+  const [filtro, setFiltro] = useState("");
 
-  async function handleCadastro(formData: FormData) {
-    const result = await criarPosto(formData);
-    
-    if (result.success) {
-      toast.success("Posto cadastrado com sucesso!");
-      formRef.current?.reset(); // Limpa os campos do formulário
-      setIsModalCadastroAberto(false); // Fecha o modal
-    } else {
-      toast.error(result.error || "Erro ao cadastrar");
-    }
-  }
+  const filtrados = postosInitial.filter(p =>
+    p.nome.toLowerCase().includes(filtro.toLowerCase()) ||
+    p.cidade?.toLowerCase().includes(filtro.toLowerCase())
+  );
 
   return (
     <>
-      {/* HEADER DE AÇÕES */}
-      <div className="mb-10 flex justify-between items-center">
-        <div className="hidden md:block">
-          <span className="text-gray-400 font-bold text-sm uppercase tracking-widest">
-            {postosInitial.length} Postos Cadastrados
-          </span>
-        </div>
-        <button 
-          onClick={() => setIsModalCadastroAberto(true)}
-          className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 active:scale-95 hover:translate-y-[-2px]"
-        >
-          <Plus size={22} strokeWidth={3} />
-          NOVO POSTO
-        </button>
+      {/* BUSCA DINÂMICA */}
+      <div className="relative mb-8 group">
+        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-green-600 transition-colors" size={20} />
+        <input
+          type="text"
+          placeholder="Buscar posto por nome ou cidade..."
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+          className="w-full p-5 pl-16 bg-white border-2 border-slate-100 rounded-[2rem] outline-none focus:border-green-600 shadow-xl shadow-slate-200/40 transition-all font-bold text-slate-700"
+        />
       </div>
 
       {/* GRID DE CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {postosInitial.map((posto) => (
-          <div 
-            key={posto.id}
-            onClick={() => setPostoSelecionado({ id: posto.id, nome: posto.nome })}
-            className="group bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm 
-                       hover:shadow-2xl hover:shadow-blue-900/5 hover:border-blue-200 
-                       hover:translate-y-[-4px] active:scale-[0.97] transition-all cursor-pointer 
-                       relative overflow-hidden"
-          >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filtrados.map((p) => (
+          <div key={p.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden">
             <div className="flex justify-between items-start mb-6">
-              <div className="bg-orange-50 p-4 rounded-2xl text-orange-500 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                <MapPin size={28} />
+              <div className="bg-slate-900 text-green-500 p-4 rounded-2xl shadow-lg group-hover:bg-green-600 group-hover:text-white transition-all">
+                <Fuel size={24} />
               </div>
-              <div className="bg-gray-50 px-4 py-1.5 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-tight">
-                {posto._count?.abastecimentos || 0} Abastecimentos
+              <div className="flex gap-2">
+                <Link
+                  href={`/posto/editar/${p.id}`}
+                  className="p-2 bg-slate-50 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-xl transition-colors border border-slate-100"
+                >
+                  <Pencil size={16} />
+                </Link>
+                <BotaoExcluir id={p.id} tabela="posto" />
               </div>
             </div>
 
-            <h3 className="text-2xl font-black text-gray-800 uppercase tracking-tighter mb-2 group-hover:text-blue-600 transition-colors">
-              {posto.nome}
+            <h3 className="text-2xl font-black text-slate-800 italic uppercase tracking-tighter leading-tight mb-2">
+              {p.nome}
             </h3>
-            
-            <p className="text-gray-400 text-sm font-bold flex items-center gap-1 mb-8">
-              Ver histórico de preços
-              <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+
+            <p className="flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em]">
+              <MapPin size={12} className="text-green-600" /> {p.cidade || "Posto Homologado"}
             </p>
 
-            <div className="flex items-center justify-between pt-6 border-t border-gray-50">
-              <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Data Analytics</span>
-              <BarChart3 size={20} className="text-gray-200 group-hover:text-blue-400 transition-all" />
+            <div className="mt-8 pt-6 border-t border-slate-50 flex justify-between items-center">
+              <div>
+                <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Abastecimentos</span>
+                <span className="text-xl font-black text-slate-900">{p._count.abastecimentos}</span>
+              </div>
+              <span className="text-[10px] font-black text-green-600 bg-green-50 px-3 py-1 rounded-full uppercase tracking-widest">
+                Ativo
+              </span>
             </div>
           </div>
         ))}
       </div>
-
-      {/* MODAL: GRÁFICO DE PREÇOS */}
-      {postoSelecionado && (
-        <ModalGraficoPreco 
-          postoId={postoSelecionado.id} 
-          nomePosto={postoSelecionado.nome} 
-          onClose={() => setPostoSelecionado(null)} 
-        />
-      )}
-
-      {/* MODAL: CADASTRO DE NOVO POSTO */}
-      {isModalCadastroAberto && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-md rounded-[3rem] p-10 shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <h2 className="text-3xl font-black text-gray-900 italic uppercase tracking-tighter">Novo Posto</h2>
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Adicionar parceiro</p>
-              </div>
-              <button 
-                onClick={() => setIsModalCadastroAberto(false)} 
-                className="p-3 bg-gray-100 hover:bg-red-50 hover:text-red-500 rounded-full transition-all active:scale-90"
-              >
-                <X size={24}/>
-              </button>
-            </div>
-            
-            <form ref={formRef} action={handleCadastro} className="space-y-6">
-              <div className="space-y-2">
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                  Nome do Posto
-                </label>
-                <input 
-                  name="nome" 
-                  type="text" 
-                  placeholder="EX: AUTO POSTO BRASIL" 
-                  className="w-full border-2 border-gray-50 p-5 rounded-2xl bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50/50 outline-none font-bold text-gray-800 placeholder:text-gray-300 transition-all"
-                  required 
-                  autoFocus
-                />
-              </div>
-              
-              <button 
-                type="submit" 
-                className="w-full bg-gray-900 text-white py-5 rounded-2xl font-black text-lg shadow-xl hover:bg-blue-600 transition-all active:scale-[0.98]"
-              >
-                SALVAR REGISTRO
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </>
   );
 }

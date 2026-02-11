@@ -35,6 +35,7 @@ model Motorista {
 model Posto {
   id             String          @id @default(cuid())
   nome           String
+  cidade         String?
   abastecimentos Abastecimento[]
 }
 

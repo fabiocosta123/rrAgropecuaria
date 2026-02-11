@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import Link from "next/link";
-import { BotaoExcluir } from "@/app/components/BotaoExlcuir";
+import MotoristasContent from "./MotoristaContent";
+import { User, Plus } from "lucide-react";
 
 export default async function MotoristasPage() {
   const motoristas = await prisma.motorista.findMany({ 
@@ -16,51 +16,38 @@ export default async function MotoristasPage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl mx-auto text-black">
-      <header className="mb-10">
-        <h1 className="text-3xl font-black text-gray-900">Motoristas</h1>
-        <p className="text-gray-500 font-medium">Gerencie a equipe de condutores da RR Agro</p>
+    <div className="p-6 md:p-10 max-w-7xl mx-auto min-h-screen bg-slate-50/50 text-slate-900">
+      {/* HEADER PADRONIZADO */}
+      <header className="mb-8">
+        <h1 className="text-5xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">Motoristas</h1>
+        <p className="text-slate-400 font-bold uppercase text-xs tracking-[0.3em] mt-3">Gestão de Operadores • RR Agro</p>
       </header>
 
-      {/* Formulário de Cadastro */}
-      <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-12">
-        <form action={criarMotorista} className="flex gap-4">
-          <input 
-            name="nome" 
-            placeholder="Nome Completo do Motorista" 
-            className="border-2 border-gray-50 p-3 rounded-xl flex-1 focus:border-blue-500 outline-none transition text-black" 
-            required 
-          />
-          <button type="submit" className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all">
-            Adicionar Motorista
-          </button>
+      {/* FORMULÁRIO DE CADASTRO - PADRÃO DARK INDUSTRIAL */}
+      <section className="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl mb-8 border border-slate-800">
+        <form action={criarMotorista} className="flex flex-col md:flex-row gap-5">
+          <div className="flex-1 space-y-1">
+            <label className="text-[10px] font-black text-slate-500 uppercase ml-2 tracking-widest">Nome do Condutor</label>
+            <div className="relative">
+              <User className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+              <input 
+                name="nome" 
+                placeholder="Nome completo" 
+                className="w-full bg-slate-800 border-none p-4 pl-14 rounded-2xl text-white font-bold placeholder:text-slate-600 focus:ring-2 focus:ring-blue-600 outline-none transition-all" 
+                required 
+              />
+            </div>
+          </div>
+          <div className="flex items-end">
+            <button type="submit" className="w-full md:w-auto bg-blue-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-blue-500 transition-all uppercase text-xs tracking-widest shadow-lg shadow-blue-600/20 active:scale-95 flex items-center justify-center gap-2">
+              <Plus size={18} /> Cadastrar
+            </button>
+          </div>
         </form>
       </section>
 
-      {/* Grid de Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {motoristas.map((m) => (
-          <div key={m.id} className="relative bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 group hover:border-blue-500 transition-all">
-            {/* Avatar Círculo */}
-            <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center text-xl text-blue-600 font-bold">
-              {m.nome.charAt(0).toUpperCase()}
-            </div>
-            
-            <div className="flex-1">
-              <p className="font-bold text-gray-800 text-lg leading-tight">{m.nome}</p>
-              <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Colaborador Ativo</p>
-            </div>
-
-            {/* Ações */}
-            <div className="flex gap-1">
-              <Link href={`/motorista/editar/${m.id}`} className="p-2 hover:bg-blue-50 rounded-lg text-blue-500 transition-colors" title="Editar">
-                ✏️
-              </Link>
-              <BotaoExcluir id={m.id} tabela="motorista" />
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* COMPONENTE DE FILTRO E LISTAGEM */}
+      <MotoristasContent motoristasIniciais={motoristas} />
     </div>
   );
 }

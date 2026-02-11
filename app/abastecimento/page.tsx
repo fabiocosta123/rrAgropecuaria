@@ -1,31 +1,35 @@
 import { prisma } from "@/lib/prisma";
-import { FormAbastecimento } from "./FormAbastecimento"; 
-import { salvarAbastecimento } from "./actions"; 
+import HistoricoContent from "./HistoricoContent";
 
-export default async function NovoAbastecimentoPage() {
-  // 1. Busca os dados no servidor de forma paralela
-  const [veiculos, motoristas, postos] = await Promise.all([
-    prisma.veiculo.findMany({ orderBy: { placa: 'asc' } }),
-    prisma.motorista.findMany({ orderBy: { nome: 'asc' } }),
-    prisma.posto.findMany({ orderBy: { nome: 'asc' } }),
-  ]);
+export default async function HistoricoPage() {
+  const abastecimentos = await prisma.abastecimento.findMany({
+    include: {
+      veiculo: true,
+      motorista: true,
+      posto: true
+    },
+    orderBy: {
+      data: 'desc'
+    }
+  });
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <header className="mb-8">
-        <h1 className="text-3xl font-black text-gray-900 tracking-tighter uppercase italic">
-          Novo Abastecimento
-        </h1>
-        <p className="text-gray-500 font-medium">Preencha os dados abaixo para atualizar a frota.</p>
+    <div className="p-6 md:p-10 max-w-7xl mx-auto min-h-screen bg-slate-50/50">
+      <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-5xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">Histórico</h1>
+          <p className="text-slate-400 font-bold uppercase text-xs tracking-[0.3em] mt-3">Relatório Geral de Abastecimentos</p>
+        </div>
+        <a 
+          href="/abastecimento/novo" 
+          className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black hover:bg-blue-600 transition-all uppercase text-xs tracking-widest shadow-xl active:scale-95"
+        >
+          + Novo Registro
+        </a>
       </header>
 
-      
-      <FormAbastecimento 
-        veiculos={veiculos} 
-        motoristas={motoristas} 
-        postos={postos}         
-        salvarAction={salvarAbastecimento as any}
-      />
+      {/* Componente Client com Filtros e Tabela */}
+      <HistoricoContent abastecimentos={abastecimentos} />
     </div>
   );
 }
