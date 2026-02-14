@@ -2,11 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { unstable_noStore as noStore } from 'next/cache';
 
-export async function GET(request: Request, { params }: { params: any }) {
+export async function GET(
+  request: Request, 
+  { params }: { params: Promise<{ id: string }> }
+) {
   noStore(); 
   try {
-    const resolvedParams = await params;
-    const id = resolvedParams.id;
+    const { id } = await params;
 
     const ultimoRegistro = await prisma.abastecimento.findFirst({
       where: { veiculoId: id },
