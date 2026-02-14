@@ -9,7 +9,7 @@ import {
 export function GraficoConsumo({ dados }: { dados: any[] }) {
   const [isClient, setIsClient] = useState(false);
 
-  // gráfico só renderize no navegador
+  // renderiza no navegador
   useEffect(() => {
     setIsClient(true);
   }, []);

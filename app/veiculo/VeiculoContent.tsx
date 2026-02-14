@@ -47,7 +47,7 @@ export default function VeiculosContent({ veiculosIniciais }: { veiculosIniciais
                   <Link href={`/veiculo/editar/${v.id}`} className="p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-slate-100">
                     <Pencil size={16} />
                   </Link>
-                  <BotaoExcluir id={v.id} tabela="veiculo" />
+                  <BotaoExcluir id={v.id} />
                 </div>
               </div>
 

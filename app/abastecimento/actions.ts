@@ -3,72 +3,79 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-
-export type ActionResponse = {
-  success: boolean;
-  message: string;
-};
-
-export async function salvarAbastecimento(formData: FormData): Promise<ActionResponse> {
+// salvar e editar
+export async function salvarAbastecimento(formData: FormData) {
+  const id = formData.get("id") as string;
   const veiculoId = formData.get("veiculoId") as string;
   const motoristaId = formData.get("motoristaId") as string;
   const postoId = formData.get("postoId") as string;
-  const hodometro = Number(formData.get("hodometro"));
-  const litros = Number(formData.get("litros"));
-  const preco = Number(formData.get("preco"));
+  const hodometroDigitado = Number(formData.get("hodometro"));
+  const quantidadeLitros = Number(formData.get("litros"));
+  const valorInput = Number(formData.get("preco"));
   const dataString = formData.get("data") as string;
-
-  // 1. Validação de segurança básica
-  if (!veiculoId || veiculoId === "undefined") {
-    return { success: false, message: "ID do veículo não identificado. Selecione o veículo novamente." };
-  }
+  const dataDigitada = new Date(`${dataString}T12:00:00`);
 
   try {
-    // 2. Busca o maior KM EXCLUSIVO deste veículo
-    const ultimo = await prisma.abastecimento.findFirst({
-      where: { veiculoId: veiculoId },
-      orderBy: { hodometro: 'desc' },
-      select: { hodometro: true }
-    });
+    let valorFinalTotal = 0;
+    let precoPorLitroReal = 0;
 
-    const maiorKmBanco = ultimo?.hodometro || 0;
-
-    // 3. Validação de Hodômetro
-    if (hodometro <= maiorKmBanco) {
-      return { 
-        success: false, 
-        message: `KM Inválido! Para este veículo, o valor deve ser maior que ${maiorKmBanco.toLocaleString('pt-BR')} KM.` 
-      };
+    if (valorInput < 20 && quantidadeLitros > 0) {
+      precoPorLitroReal = valorInput;
+      valorFinalTotal = quantidadeLitros * valorInput;
+    } else {
+      valorFinalTotal = valorInput;
+      precoPorLitroReal = quantidadeLitros > 0 ? valorInput / quantidadeLitros : 0;
     }
 
-    // 4. Criação do registro
-    await prisma.abastecimento.create({
-      data: {
-        veiculoId,
-        motoristaId,
-        postoId,
-        data: new Date(`${dataString}T12:00:00`),
-        hodometro,
-        quantidadeLitros: litros,
-        precoPorLitro: preco,
-        valorTotal: litros * preco,
-      },
-    });
+    const dadosBase = {
+      veiculoId,
+      motoristaId,
+      postoId,
+      hodometro: hodometroDigitado,
+      quantidadeLitros,
+      precoPorLitro: precoPorLitroReal,
+      valorTotal: valorFinalTotal,
+      data: dataDigitada,
+    };
 
-    // 5. Revalidação de cache
+    if (id && id !== "" && id !== "undefined") {
+      await prisma.abastecimento.update({
+        where: { id },
+        data: dadosBase,
+      });
+    } else {
+      const ultimo = await prisma.abastecimento.findFirst({
+        where: { veiculoId },
+        orderBy: { hodometro: 'desc' }
+      });
+      
+      if (ultimo && hodometroDigitado <= ultimo.hodometro && dataDigitada >= new Date(ultimo.data)) {
+        return { success: false, message: "KM deve ser superior ao último registro." };
+      }
+      await prisma.abastecimento.create({ data: dadosBase });
+    }
+
+    revalidatePath("/dashboard");
     revalidatePath("/historico");
-    revalidatePath("/dashboard"); 
-    
-    return { 
-      success: true, 
-      message: "Abastecimento registrado com sucesso!" 
-    };
+    return { success: true, message: id ? "Alteração salva!" : "Registrado!" };
+  } catch (e) {
+    return { success: false, message: "Erro no banco de dados." };
+  }
+}
 
+// Excluir
+export async function excluirAbastecimento(id: string) {
+  try {
+    await prisma.abastecimento.delete({
+      where: { id },
+    });
+    
+    revalidatePath("/dashboard");
+    revalidatePath("/historico");
+    
+    return { success: true };
   } catch (error) {
-    console.error("Erro ao salvar abastecimento:", error);
-    return { 
-      success: false, 
-      message: "Erro técnico ao salvar no banco de dados. Verifique os campos." 
-    };
+    console.error("Erro ao excluir:", error);
+    return { success: false, message: "Erro ao excluir registro." };
   }
 }

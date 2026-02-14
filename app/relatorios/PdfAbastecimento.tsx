@@ -2,7 +2,7 @@
 
 import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
 
-// Estilização para o PDF (não usa Tailwind, usa um sistema próprio de CSS-in-JS)
+// Estilização para o pdf
 const styles = StyleSheet.create({
   page: { padding: 40, backgroundColor: "#FFFFFF" },
   header: { marginBottom: 20, borderBottom: 2, borderBottomColor: "#1e40af", paddingBottom: 10 },

@@ -11,10 +11,9 @@ export async function GET(
       data: true,
       precoPorLitro: true,
     },
-    orderBy: { data: 'asc' }, // Ordem antiga para a nova (para o gráfico fazer sentido)
+    orderBy: { data: 'asc' }, 
   });
 
-  // Formatamos a data para algo legível no gráfico (ex: 10/02)
   const dadosFormatados = precos.map(p => ({
     data: new Date(p.data).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
     preco: p.precoPorLitro

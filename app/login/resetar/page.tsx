@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { redefinirSenha } from "../actions"; // Certifique-se que o caminho está correto
+import { redefinirSenha } from "../actions"; 
 
 function ResetarSenhaContent() {
   const router = useRouter();
@@ -16,7 +16,7 @@ function ResetarSenhaContent() {
     msg: "",
   });
 
-  // Proteção: Se não houver token na URL, avisa o usuário
+  
   useEffect(() => {
     if (!token) {
       setStatus({ tipo: "error", msg: "Link de recuperação inválido ou ausente." });
@@ -45,7 +45,7 @@ function ResetarSenhaContent() {
         setStatus({ tipo: "error", msg: result.error });
       } else {
         setStatus({ tipo: "success", msg: "Senha alterada com sucesso! Redirecionando..." });
-        // Aguarda 2 segundos para o usuário ler a mensagem de sucesso
+        
         setTimeout(() => {
           router.push("/login");
         }, 2500);
@@ -79,7 +79,7 @@ function ResetarSenhaContent() {
           </div>
         )}
 
-        {/* FORMULÁRIO (Só exibe se não houver erro de token ou sucesso total) */}
+        {/* FORMULÁRIO */}
         {status.tipo !== "success" && token && (
           <form onSubmit={handleReset} className="space-y-5">
             <div>

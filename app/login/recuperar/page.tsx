@@ -8,13 +8,13 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function solicitarRecuperacao(email: string) {
   "use server";
 
-  // 1. Verificar se o usuário existe
+  
   const usuario = await prisma.usuario.findUnique({ where: { email } });
   if (!usuario) return { error: "E-mail não encontrado." };
 
-  // 2. Gerar Token único e expiração (1 hora)
+  
   const token = crypto.randomBytes(32).toString("hex");
-  const expiracao = new Date(Date.now() + 3600000); // +1h
+  const expiracao = new Date(Date.now() + 3600000); 
 
   // 3. Salvar no Banco
   await prisma.usuario.update({
@@ -30,7 +30,7 @@ export async function solicitarRecuperacao(email: string) {
   
   try {
     await resend.emails.send({
-      from: "RR AGRO <onboarding@resend.dev>", // Ou seu domínio
+      from: "RR AGRO <onboarding@resend.dev>", 
       to: email,
       subject: "Recuperação de Senha - RR AGRO",
       html: `<p>Você solicitou a redefinição de senha. Clique no link abaixo para prosseguir:</p>

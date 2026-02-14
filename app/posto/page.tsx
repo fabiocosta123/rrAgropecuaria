@@ -19,13 +19,13 @@ export default async function PostosPage() {
 
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto min-h-screen bg-slate-50/50">
-      {/* HEADER PADRONIZADO */}
+      {/* HEADER */}
       <header className="mb-8">
         <h1 className="text-5xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">Postos Parceiros</h1>
         <p className="text-slate-400 font-bold uppercase text-xs tracking-[0.3em] mt-3">Rede de Abastecimento • RR Agro</p>
       </header>
 
-      {/* FORMULÁRIO DE CADASTRO - PADRÃO DARK INDUSTRIAL (VERDE) */}
+      {/* FORMULÁRIO DE CADASTRO */}
       <section className="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl mb-8 border border-slate-800">
         <form action={criarPosto} className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div className="space-y-1">

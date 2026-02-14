@@ -1,61 +1,58 @@
 "use client";
 
+import { Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { excluirItem } from "@/lib/actions";
-import { ModalConfirmacao } from "./ModalConfirmacao";
+import { excluirAbastecimento } from "@/app/abastecimento/actions"; // Ajuste o caminho aqui
 
-// Definindo tipos mais estritos para melhor autocompletar
-type Tabela = 'veiculo' | 'motorista' | 'posto' | 'abastecimento';
+export function BotaoExcluir({ id }: { id: string }) {
+  const [confirmar, setConfirmar] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-interface BotaoExcluirProps {
-  id: string;
-  tabela: Tabela;
-}
-
-export function BotaoExcluir({ id, tabela }: BotaoExcluirProps) {
-  const [modalAberto, setModalAberto] = useState(false);
-  const [isExcluindo, setIsExcluindo] = useState(false);
-
-  async function confirmarExclusao() {
-    setIsExcluindo(true);
+  async function handleExcluir() {
+    setLoading(true);
     try {
-      const res = await excluirItem(id, tabela);
-      if (res.success) {
-        toast.success("Registro removido com sucesso!");
-        setModalAberto(false);
+      const result = await excluirAbastecimento(id);
+      if (result.success) {
+        toast.success("Registro excluído com sucesso!");
       } else {
-        toast.error(res.message || "Erro ao excluir registro.");
+        toast.error("Erro ao excluir.");
       }
     } catch (error) {
-      toast.error("Erro de conexão ao tentar excluir.");
+      toast.error("Erro na comunicação com o servidor.");
     } finally {
-      setIsExcluindo(false);
+      setLoading(false);
+      setConfirmar(false);
     }
   }
 
-  return (
-    <>
-      <button 
-        onClick={(e) => {
-          e.preventDefault(); // Evita navegar se o botão estiver dentro de um Link
-          setModalAberto(true);
-        }}
-        disabled={isExcluindo}
-        className="p-2 hover:bg-red-50 rounded-lg text-red-500 transition-colors disabled:opacity-50"
-        title="Excluir"
-      >
-        {isExcluindo ? "..." : "🗑️"}
-      </button>
+  if (confirmar) {
+    return (
+      <div className="flex items-center gap-2 bg-red-50 p-1 rounded-xl border border-red-100 animate-in fade-in slide-in-from-right-2">
+        <button
+          onClick={handleExcluir}
+          disabled={loading}
+          className="bg-red-600 text-white text-[9px] font-black px-3 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-1"
+        >
+          {loading ? <Loader2 size={12} className="animate-spin" /> : "CONFIRMAR"}
+        </button>
+        <button
+          onClick={() => setConfirmar(false)}
+          className="text-[9px] font-black text-gray-400 hover:text-gray-600 px-2"
+        >
+          CANCELAR
+        </button>
+      </div>
+    );
+  }
 
-     
-      <ModalConfirmacao 
-        isOpen={modalAberto}
-        onClose={() => setModalAberto(false)}
-        onConfirm={confirmarExclusao}
-        titulo="Confirmar Exclusão"
-        mensagem="Esta ação não pode ser desfeita. Todos os dados vinculados a este registro serão perdidos."
-      />
-    </>
+  return (
+    <button
+      onClick={() => setConfirmar(true)}
+      className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all group-hover:scale-110"
+      title="Excluir Registro"
+    >
+      <Trash2 size={18} />
+    </button>
   );
 }

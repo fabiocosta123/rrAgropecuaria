@@ -46,7 +46,7 @@ export default function MotoristasContent({ motoristasIniciais }: { motoristasIn
               <Link href={`/motorista/editar/${m.id}`} className="p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-slate-100 flex justify-center">
                 <Pencil size={16} />
               </Link>
-              <BotaoExcluir id={m.id} tabela="motorista" />
+              <BotaoExcluir id={m.id} />
             </div>
           </div>
         ))}

@@ -6,7 +6,7 @@ import { PdfAbastecimento } from "@/app/relatorios/PdfAbastecimento";
 import { useEffect, useState } from "react";
 
 export function BotaoExportar({ registros }: { registros: any[] }) {
-  // Evita erros de hidratação (SSR vs Client)
+  
   const [isClient, setIsClient] = useState(false);
   useEffect(() => setIsClient(true), []);
 

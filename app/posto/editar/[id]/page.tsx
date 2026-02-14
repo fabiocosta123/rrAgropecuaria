@@ -4,9 +4,12 @@ import { redirect } from "next/navigation";
 import { Fuel, MapPin, Save, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-export default async function EditarPostoPage({ params }: { params: { id: string } }) {
+export default async function EditarPostoPage({ params }: { params: Promise<{ id: string }> }) {
+  
+  const { id } = await params;
+
   const posto = await prisma.posto.findUnique({
-    where: { id: params.id }
+    where: { id }
   });
 
   if (!posto) return redirect("/posto");
@@ -17,7 +20,7 @@ export default async function EditarPostoPage({ params }: { params: { id: string
     const cidade = formData.get("cidade") as string;
 
     await prisma.posto.update({
-      where: { id: params.id },
+      where: { id },
       data: { nome, cidade }
     });
 

@@ -42,7 +42,7 @@ export function ListaPostosCards({ postosInitial }: { postosInitial: any[] }) {
                 >
                   <Pencil size={16} />
                 </Link>
-                <BotaoExcluir id={p.id} tabela="posto" />
+                <BotaoExcluir id={p.id} />
               </div>
             </div>
 

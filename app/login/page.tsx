@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Lock, User, ShieldCheck } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,62 +17,80 @@ export default function LoginPage() {
     const usuario = formData.get("usuario");
     const senha = formData.get("senha");
 
-    // Validação
     if (usuario === "rragro" && senha === "admin") {
-      // 1. Criar o cookie no lado do cliente
       document.cookie = "auth_token=logado; path=/; max-age=86400";
-      
-      toast.success("Login realizado com sucesso! Bem-vindo.");
+      toast.success("Acesso autorizado. Carregando frota...");
 
-      // 2. Pequeno delay para o toast aparecer e o cookie ser registrado
       setTimeout(() => {
         router.push("/dashboard");
-        router.refresh(); // Força o Next.js a atualizar o Layout e mostrar o menu
-      }, 1000);
+        router.refresh();
+      }, 800);
     } else {
-      toast.error("Usuário ou senha incorretos.");
+      toast.error("Credenciais inválidas no sistema.");
       setIsLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 text-black">
-      <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-8 border border-gray-100">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Detalhes de Background */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-900 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-10">
-          <div className="inline-block bg-blue-600 p-3 rounded-2xl mb-4 shadow-lg shadow-blue-200">
-            <span className="text-white text-2xl font-black">RR</span>
+          <div className="inline-flex bg-blue-600 p-5 rounded-[2rem] mb-6 shadow-2xl shadow-blue-600/40 rotate-3 group hover:rotate-0 transition-transform duration-500">
+            <ShieldCheck size={40} className="text-white" />
           </div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">RR AGRO</h1>
+          <h1 className="text-5xl font-black text-white italic tracking-tighter uppercase leading-none">
+            RR <span className="text-blue-500">AGRO</span>
+          </h1>
+          <p className="text-slate-500 font-bold text-[10px] uppercase tracking-[0.4em] mt-4">Sistema de Gestão de Ativos</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase ml-2 mb-1 block">Usuário</label>
-            <input 
-              name="usuario"
-              type="text" 
-              className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 p-4 rounded-2xl outline-none"
-              required
-            />
-          </div>
+        <div className="bg-slate-800/50 backdrop-blur-xl p-8 rounded-[3rem] border border-white/5 shadow-2xl">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase ml-2 tracking-widest">Identificação</label>
+              <div className="relative">
+                <User className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                <input 
+                  name="usuario"
+                  placeholder="Usuário"
+                  className="w-full bg-slate-900/50 border border-slate-700 focus:border-blue-500 p-5 pl-14 rounded-2xl text-white font-bold outline-none transition-all placeholder:text-slate-600"
+                  required
+                />
+              </div>
+            </div>
 
-          <div>
-            <label className="text-[10px] font-black text-gray-400 uppercase ml-2 mb-1 block">Senha</label>
-            <input 
-              name="senha"
-              type="password" 
-              className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-500 p-4 rounded-2xl outline-none"
-              required
-            />
-          </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase ml-2 tracking-widest">Chave de Acesso</label>
+              <div className="relative">
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                <input 
+                  name="senha"
+                  type="password" 
+                  placeholder="••••••••"
+                  className="w-full bg-slate-900/50 border border-slate-700 focus:border-blue-500 p-5 pl-14 rounded-2xl text-white font-bold outline-none transition-all placeholder:text-slate-600"
+                  required
+                />
+              </div>
+            </div>
 
-          <button 
-            disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 transition-all disabled:opacity-50"
-          >
-            {isLoading ? "Entrando..." : "Entrar na Conta"}
-          </button>
-        </form>
+            <button 
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+            >
+              {isLoading ? "Validando..." : "Autenticar no Sistema"}
+            </button>
+          </form>
+        </div>
+        
+        <p className="text-center mt-8 text-slate-600 text-[10px] font-black uppercase tracking-widest">
+          Propriedade Privada • RR Agropecuária v1.0
+        </p>
       </div>
     </div>
   );

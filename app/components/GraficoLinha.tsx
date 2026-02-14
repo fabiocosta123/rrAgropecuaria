@@ -1,4 +1,4 @@
-"use client"; // Obrigatório para Recharts
+"use client"; 
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 

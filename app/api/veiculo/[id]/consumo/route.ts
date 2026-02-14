@@ -7,7 +7,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
     orderBy: { hodometro: 'asc' },
   });
 
-  // Calculamos o KM/L comparando com o abastecimento anterior
   const dadosGrafico = abastecimentos.map((atual, index) => {
     if (index === 0) return null;
     const anterior = abastecimentos[index - 1];

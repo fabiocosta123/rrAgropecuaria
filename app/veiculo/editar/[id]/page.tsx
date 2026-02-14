@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 export default async function EditarVeiculoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  // Busca o veículo com os nomes de campos corretos do seu Schema
   const veiculo = await prisma.veiculo.findUnique({
     where: { id }
   });
@@ -56,7 +55,7 @@ export default async function EditarVeiculoPage({ params }: { params: Promise<{ 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Intervalo de Troca</label>
-            {/* O segredo está no defaultValue ser exatamente igual ao valor do banco */}
+            
             <select 
               name="intervalo" 
               defaultValue={veiculo.intervaloTrocaOleo.toString()} 

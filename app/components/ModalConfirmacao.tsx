@@ -16,7 +16,7 @@ export function ModalConfirmacao({ isOpen, onClose, onConfirm, titulo, mensagem 
 
   useEffect(() => {
     setMounted(true);
-    // Bloqueia o scroll da página quando o modal estiver aberto
+    
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
