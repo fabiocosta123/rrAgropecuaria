@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Search, User, ShieldCheck, Pencil } from "lucide-react";
 import Link from "next/link";
-import { BotaoExcluir } from "@/app/components/BotaoExlcuir";
+import { BotaoExcluir } from "@/app/components/BotaoExcluir";
 
 export default function MotoristasContent({ motoristasIniciais }: { motoristasIniciais: any[] }) {
   const [filtro, setFiltro] = useState("");

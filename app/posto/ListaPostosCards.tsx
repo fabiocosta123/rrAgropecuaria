@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Search, Fuel, MapPin, Pencil } from "lucide-react";
-import { BotaoExcluir } from "@/app/components/BotaoExlcuir";
+import { BotaoExcluir } from "@/app/components/BotaoExcluir";
 import Link from "next/link";
 
 export function ListaPostosCards({ postosInitial }: { postosInitial: any[] }) {

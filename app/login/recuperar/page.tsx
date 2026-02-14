@@ -5,7 +5,7 @@ import crypto from "crypto";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function solicitarRecuperacao(email: string) {
+export default async function solicitarRecuperacao(email: string) {
   "use server";
 
   

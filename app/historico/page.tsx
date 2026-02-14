@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { BotaoExcluir } from "@/app/components/BotaoExlcuir";
+import { BotaoExcluir } from "@/app/components/BotaoExcluir";
 import { 
   TrendingUp, 
   TrendingDown, 
