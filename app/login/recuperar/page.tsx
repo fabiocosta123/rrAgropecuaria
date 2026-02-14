@@ -1,44 +1,14 @@
 
-import { prisma } from "@/lib/prisma";
-import { Resend } from "resend";
-import crypto from "crypto";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-export default async function solicitarRecuperacao(email: string) {
-  "use server";
-
-  
-  const usuario = await prisma.usuario.findUnique({ where: { email } });
-  if (!usuario) return { error: "E-mail não encontrado." };
-
-  
-  const token = crypto.randomBytes(32).toString("hex");
-  const expiracao = new Date(Date.now() + 3600000); 
-
-  // 3. Salvar no Banco
-  await prisma.usuario.update({
-    where: { email },
-    data: {
-      resetToken: token,
-      resetTokenExpiry: expiracao,
-    },
-  });
-
-  // 4. Enviar E-mail
-  const urlReset = `${process.env.NEXT_PUBLIC_APP_URL}/login/resetar?token=${token}`;
-  
-  try {
-    await resend.emails.send({
-      from: "RR AGRO <onboarding@resend.dev>", 
-      to: email,
-      subject: "Recuperação de Senha - RR AGRO",
-      html: `<p>Você solicitou a redefinição de senha. Clique no link abaixo para prosseguir:</p>
-             <a href="${urlReset}">Redefinir minha senha</a>
-             <p>Este link expira em 1 hora.</p>`,
-    });
-    return { success: true };
-  } catch (err) {
-    return { error: "Falha ao enviar e-mail." };
-  }
+export default function RecuperarSenhaPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full p-8 bg-white rounded-3xl shadow-xl">
+        <h1 className="text-2xl font-black italic uppercase text-gray-900">Recuperar Senha</h1>
+        <p className="text-gray-500 mt-2">Funcionalidade em desenvolvimento para a RR Agro.</p>
+        <a href="/login" className="mt-4 inline-block text-blue-600 font-bold hover:underline">
+          Voltar para o Login
+        </a>
+      </div>
+    </div>
+  );
 }
